@@ -1,0 +1,7 @@
+{
+  "name": "Seguro-Defeso Fácil",
+  "description": "Aplicativo social simplificado para pescadores artesanais brasileiros acessarem o Seguro-Defeso com segurança e clareza.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
