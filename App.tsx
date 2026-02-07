@@ -60,11 +60,17 @@ const App: React.FC = () => {
 
   // Check for saved user on mount
   useEffect(() => {
-    const savedUser = localStorage.getItem('fisherData');
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      setFormData(parsedUser);
-      // setActiveTab('login'); // Removed to always show Landing page first
+    try {
+      const savedUser = localStorage.getItem('fisherData');
+      if (savedUser && savedUser !== 'undefined') {
+        const parsedUser = JSON.parse(savedUser);
+        if (parsedUser && typeof parsedUser === 'object') {
+          // Merge with defaults to ensure all fields exist
+          setFormData(prev => ({ ...prev, ...parsedUser }));
+        }
+      }
+    } catch (e) {
+      console.error("Local Storage Load Error:", e);
     }
   }, []);
 

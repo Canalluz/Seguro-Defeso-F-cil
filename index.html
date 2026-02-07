@@ -20,14 +20,30 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root"
+    style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; color: #64748b; background: white;">
+    <div style="text-align: center;">
+      <h2 style="margin-bottom: 8px;">Carregando Seguro-Defeso Fácil...</h2>
+      <p style="font-size: 14px;">Iniciando sistema seguro...</p>
+    </div>
+  </div>
+
   <script>
+    // Global Error Trap for diagnostics
     window.onerror = function (msg, url, line, col, error) {
-      console.log("Global Error:", msg, "at", url, ":", line);
+      console.error("Critical Error:", msg);
+      var root = document.getElementById('root');
+      if (root) {
+        root.innerHTML = '<div style="padding: 20px; color: #ef4444; text-align: center; background: white; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">' +
+          '<h3>Erro ao carregar o aplicativo</h3>' +
+          '<p style="font-size: 14px; margin-top: 10px; max-width: 80%;">' + (msg || 'Erro desconhecido') + '</p>' +
+          '<button onclick="location.reload()" style="margin-top: 15px; padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Tentar Novamente</button>' +
+          '</div>';
+      }
       return false;
     };
   </script>
-  <script type="module" src="./index.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
 </body>
 
 </html>
