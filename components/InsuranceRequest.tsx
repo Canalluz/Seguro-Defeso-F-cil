@@ -387,8 +387,8 @@ export const InsuranceRequest: React.FC<InsuranceRequestProps> = ({ fisher, defe
         <div className="flex flex-col h-full max-w-4xl mx-auto w-full">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
-                <button onClick={handleBack} className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 active:scale-90 transition-all">
-                    <ChevronLeft className="w-6 h-6 text-slate-700" />
+                <button onClick={handleBack} className="bg-white py-2 px-4 rounded-full shadow-sm border border-slate-100 active:scale-90 transition-all flex items-center gap-2 text-slate-600 font-bold text-sm">
+                    <ChevronLeft className="w-4 h-4" /> Voltar
                 </button>
                 <div className="flex-1">
                     <h2 className="text-xl md:text-2xl font-black text-slate-800 leading-none">Pedir Seguro</h2>

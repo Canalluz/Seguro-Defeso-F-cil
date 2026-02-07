@@ -33,9 +33,9 @@ export const ReapMenu: React.FC<ReapMenuProps> = ({ onBack }) => {
             <div className="bg-white rounded-[3rem] p-8 shadow-xl border border-slate-100 text-center relative mb-8">
                 <button
                     onClick={onBack}
-                    className="absolute left-6 top-8 p-2 rounded-full bg-slate-100 text-slate-600 active:scale-95 transition-all"
+                    className="absolute left-6 top-8 py-2 px-4 rounded-full bg-slate-100 text-slate-600 font-bold text-sm flex items-center gap-2 active:scale-95 transition-all shadow-sm"
                 >
-                    <ArrowLeft className="w-6 h-6" />
+                    <ArrowLeft className="w-4 h-4" /> Voltar
                 </button>
                 <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 shadow-inner">
                     <ClipboardList className="w-10 h-10" />
