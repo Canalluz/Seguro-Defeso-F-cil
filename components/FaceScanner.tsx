@@ -40,25 +40,57 @@ export const FaceScanner: React.FC<FaceScannerProps> = ({ mode, onScanComplete }
     }, []);
 
     const startCamera = async () => {
+        setError(null);
         try {
-            const mediaStream = await navigator.mediaDevices.getUserMedia({
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                // Check if it's an SSL issue
+                if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+                    setError("Erro de Segurança: A câmera só funciona em conexões seguras (HTTPS). Verifique se o link começa com https://");
+                } else {
+                    setError("Seu navegador não suporta acesso à câmera ou bloqueou as permissões para este site.");
+                }
+                return;
+            }
+
+            const constraints = {
                 video: {
                     facingMode: 'user',
                     width: { ideal: 640 },
                     height: { ideal: 480 }
                 }
-            });
+            };
+
+            let mediaStream: MediaStream;
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+            } catch (firstErr) {
+                console.warn("Retrying with simple constraints...", firstErr);
+                // Fallback to minimal constraints if ideal fails
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            }
+
             setStream(mediaStream);
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
                 videoRef.current.onloadedmetadata = () => {
-                    videoRef.current?.play();
+                    videoRef.current?.play().catch(err => {
+                        console.error("Video play error:", err);
+                        setError("Erro ao iniciar vídeo. Tente tocar na tela para autorizar.");
+                    });
                     startDetectionLoop();
                 };
             }
-        } catch (err) {
-            console.error("Camera error:", err);
-            setError("Câmera não encontrada ou permissão negada.");
+        } catch (err: any) {
+            console.error("Camera error details:", err);
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                setError("Acesso à câmera negado. Clique no cadeado na barra de endereços para liberar a câmera.");
+            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                setError("Câmera não encontrada. Se estiver no PC, verifique se a webcam está conectada.");
+            } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                setError("A câmera já está sendo usada por outro site ou aplicativo.");
+            } else {
+                setError("Erro ao acessar câmera: " + (err.message || "Permissão negada."));
+            }
         }
     };
 
@@ -161,13 +193,21 @@ export const FaceScanner: React.FC<FaceScannerProps> = ({ mode, onScanComplete }
                     {error ? (
                         <>
                             <AlertCircle className="w-12 h-12 text-red-500 mb-2" />
-                            <p className="text-center px-6 text-sm font-black text-red-400 leading-tight mb-4">{error}</p>
-                            <button
-                                onClick={() => window.location.reload()}
-                                className="bg-white/10 text-white px-6 py-2 rounded-full font-bold text-xs uppercase border border-white/20 active:scale-95 transition-transform"
-                            >
-                                Recarregar Página
-                            </button>
+                            <p className="text-center px-6 text-sm font-black text-red-400 leading-tight mb-6">{error}</p>
+                            <div className="flex flex-col gap-3 w-full px-10">
+                                <button
+                                    onClick={startCamera}
+                                    className="bg-blue-600 text-white px-6 py-3 rounded-full font-bold text-xs uppercase shadow-xl active:scale-95 transition-transform"
+                                >
+                                    Tentar Novamente
+                                </button>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="bg-white/10 text-white px-6 py-2 rounded-full font-bold text-xs uppercase border border-white/20 active:scale-95 transition-transform"
+                                >
+                                    Recarregar Página
+                                </button>
+                            </div>
                         </>
                     ) : (
                         <div className="flex flex-col items-center">
