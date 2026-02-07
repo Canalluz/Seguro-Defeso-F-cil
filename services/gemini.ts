@@ -1,11 +1,24 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 
 // Safe way to get API Key in Vite/Vercel
-const apiKey = (typeof process !== 'undefined' ? process.env?.API_KEY : null) ||
-  (import.meta as any).env?.VITE_GEMINI_API_KEY ||
-  "";
+const getApiKey = () => {
+  return (typeof process !== 'undefined' ? process.env?.API_KEY : null) ||
+    (import.meta as any).env?.VITE_GEMINI_API_KEY ||
+    "";
+};
 
-const ai = new GoogleGenAI({ apiKey });
+let aiInstance: GoogleGenAI | null = null;
+const getAI = () => {
+  if (!aiInstance) {
+    const key = getApiKey();
+    if (!key) {
+      console.warn("Gemini API Key is missing. AI features will be disabled.");
+      return null;
+    }
+    aiInstance = new GoogleGenAI(key);
+  }
+  return aiInstance;
+};
 
 function decode(base64: string) {
   const binaryString = atob(base64);
@@ -43,6 +56,9 @@ const audioCache = new Map<string, AudioBuffer>();
 
 export const speakExplanation = async (text: string) => {
   try {
+    const ai = getAI();
+    if (!ai) return;
+
     if (!globalAudioContext) {
       globalAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
     }
