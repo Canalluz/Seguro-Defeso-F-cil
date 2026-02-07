@@ -52,16 +52,50 @@ export const FaceScanner: React.FC<FaceScannerProps> = ({ mode, onScanComplete }
         return () => stopCamera();
     }, []);
 
+    const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+    useEffect(() => {
+        if (stream && videoRef.current) {
+            const video = videoRef.current;
+            video.srcObject = stream;
+
+            video.onloadedmetadata = () => {
+                video.play().then(() => {
+                    setIsVideoPlaying(true);
+                    startDetectionLoop();
+                }).catch(err => {
+                    console.error("Auto-play blocked:", err);
+                    setIsVideoPlaying(false);
+                    // This is common on mobile, we'll keep the status as 'waiting' 
+                    // or show a manual start button if it doesn't start
+                });
+            };
+        }
+    }, [stream]);
+
+    const handleManualPlay = () => {
+        if (videoRef.current) {
+            videoRef.current.play().then(() => {
+                setIsVideoPlaying(true);
+                startDetectionLoop();
+            }).catch(console.error);
+        }
+    };
+
     const startCamera = async () => {
         setError(null);
         try {
+            // Strict HTTPS check for custom domains
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const isHttps = window.location.protocol === 'https:';
+
+            if (!isLocal && !isHttps) {
+                setError("Acesso Negado: O site precisa de uma conexão segura (HTTPS) para usar a câmera.");
+                return;
+            }
+
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                // Check if it's an SSL issue
-                if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-                    setError("Erro de Segurança: A câmera só funciona em conexões seguras (HTTPS). Verifique se o link começa com https://");
-                } else {
-                    setError("Seu navegador não suporta acesso à câmera ou bloqueou as permissões para este site.");
-                }
+                setError("Seu navegador não suporta acesso à câmera ou bloqueou as permissões.");
                 return;
             }
 
@@ -78,31 +112,16 @@ export const FaceScanner: React.FC<FaceScannerProps> = ({ mode, onScanComplete }
                 mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
             } catch (firstErr) {
                 console.warn("Retrying with simple constraints...", firstErr);
-                // Fallback to minimal constraints if ideal fails
                 mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
             }
 
             setStream(mediaStream);
-            if (videoRef.current) {
-                videoRef.current.srcObject = mediaStream;
-                videoRef.current.onloadedmetadata = () => {
-                    videoRef.current?.play().catch(err => {
-                        console.error("Video play error:", err);
-                        setError("Erro ao iniciar vídeo. Tente tocar na tela para autorizar.");
-                    });
-                    startDetectionLoop();
-                };
-            }
         } catch (err: any) {
             console.error("Camera error details:", err);
             if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                setError("Acesso à câmera negado. Clique no cadeado na barra de endereços para liberar a câmera.");
-            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-                setError("Câmera não encontrada. Se estiver no PC, verifique se a webcam está conectada.");
-            } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
-                setError("A câmera já está sendo usada por outro site ou aplicativo.");
+                setError("Câmera bloqueada. Clique no ícone de cadeado na barra de endereços e mude 'Câmera' para 'Permitir'.");
             } else {
-                setError("Erro ao acessar câmera: " + (err.message || "Permissão negada."));
+                setError("Não foi possível iniciar a câmera: " + (err.message || "Erro desconhecido"));
             }
         }
     };
@@ -194,6 +213,21 @@ export const FaceScanner: React.FC<FaceScannerProps> = ({ mode, onScanComplete }
                         muted
                         className="w-full h-full object-cover transform scale-x-[-1]"
                     />
+                    {!isVideoPlaying && (
+                        <div className="absolute inset-0 z-30 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+                            <Camera className="w-12 h-12 text-white mb-4 animate-bounce" />
+                            <h4 className="text-white font-black text-lg mb-2">Clique para Iniciar</h4>
+                            <p className="text-white/70 text-xs font-bold mb-6 italic">
+                                Alguns navegadores exigem um toque para liberar o vídeo.
+                            </p>
+                            <button
+                                onClick={handleManualPlay}
+                                className="bg-blue-600 text-white px-8 py-4 rounded-full font-black uppercase text-sm shadow-2xl active:scale-95 transition-transform"
+                            >
+                                Liberar Câmera
+                            </button>
+                        </div>
+                    )}
                     <canvas
                         ref={canvasRef}
                         width={640}
