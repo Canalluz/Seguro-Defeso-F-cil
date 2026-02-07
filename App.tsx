@@ -397,95 +397,87 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col pb-44 ${isLoggedIn && activeTab === 'home' ? 'bg-gradient-to-br from-blue-100 to-green-100' : 'bg-slate-50'}`}>
-      <div className="w-full max-w-screen-xl mx-auto flex flex-col min-h-screen relative">
-        {activeTab !== 'loginBiometrics' && activeTab !== 'registrationBiometrics' && (
-          <header className={`${isLoggedIn && activeTab === 'home' ? 'bg-white/95 backdrop-blur-xl' : 'bg-blue-700 text-white'} p-6 rounded-b-[3rem] shadow-xl fixed top-0 left-0 right-0 z-50 transition-all duration-500`}>
-            <div className="flex items-center justify-between max-w-screen-lg mx-auto w-full gap-4">
-              <div className="flex items-center gap-3">
-                {isLoggedIn && activeTab !== 'home' && (
-                  <button
-                    onClick={() => { playClick(); setActiveTab('home'); }}
-                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-bold text-sm active:scale-90 transition-all mr-2"
-                  >
-                    <ArrowLeft className="w-4 h-4" /> Voltar
-                  </button>
-                )}
-                <div className={`${isLoggedIn && activeTab === 'home' ? 'bg-blue-600' : 'bg-white/20'} p-3 rounded-2xl`}>
-                  <Fish className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex flex-col">
-                  <h1 className={`text-xl md:text-2xl font-black tracking-tight leading-none mb-1 ${isLoggedIn && activeTab === 'home' ? 'text-slate-800' : 'text-white'}`}>Seguro-Defeso Fácil</h1>
-                  <p className={`text-[10px] font-black uppercase tracking-widest ${isLoggedIn && activeTab === 'home' ? 'text-blue-600' : 'text-blue-100'}`}>Seu direito, explicado simples</p>
-                </div>
+    <div className={`h-screen flex flex-col overflow-hidden ${isLoggedIn && activeTab === 'home' ? 'bg-gradient-to-br from-blue-100 to-green-100' : 'bg-slate-50'}`}>
+
+      {/* Persistent Top Header (Non-fixed, but stays at top of screen due to flex-col) */}
+      {activeTab !== 'loginBiometrics' && activeTab !== 'registrationBiometrics' && (
+        <header className={`${isLoggedIn && activeTab === 'home' ? 'bg-white shadow-md' : 'bg-blue-700 text-white shadow-xl'} flex-none p-6 rounded-b-[2.5rem] z-50 transition-all duration-500`}>
+          <div className="flex items-center justify-between max-w-screen-lg mx-auto w-full gap-4">
+            <div className="flex items-center gap-3">
+              {isLoggedIn && activeTab !== 'home' && (
+                <button
+                  onClick={() => { playClick(); setActiveTab('home'); }}
+                  className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-bold text-sm active:scale-90 transition-all mr-2"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Voltar
+                </button>
+              )}
+              <div className={`${isLoggedIn && activeTab === 'home' ? 'bg-blue-600' : 'bg-white/20'} p-3 rounded-2xl`}>
+                <Fish className="w-8 h-8 text-white" />
               </div>
-
-              <div className="flex items-center gap-2">
-                {!isLoggedIn ? (
-                  <button
-                    onClick={handleInstallClick}
-                    className="flex items-center justify-center p-3 rounded-2xl shadow-lg active:scale-90 transition-all bg-yellow-400 text-blue-900 border-2 border-yellow-500"
-                    title="Instalar App"
-                  >
-                    <Download className="w-6 h-6" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center justify-center p-3 rounded-2xl shadow-lg active:scale-90 transition-all bg-red-100 text-red-600 border-2 border-red-200"
-                    title="Sair"
-                  >
-                    <LogOut className="w-6 h-6" />
-                  </button>
-                )}
-
-                {isLoggedIn && (
-                  <button onClick={() => { playClick(); setActiveTab('profile'); }} className="p-0.5 rounded-full border-2 border-blue-100 shadow-sm overflow-hidden active:scale-90 transition-transform w-12 h-12">
-                    {fisher.photoUrl ? (
-                      <img src={fisher.photoUrl} alt={fisher.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <AnimatedAvatar />
-                    )}
-                  </button>
-                )}
+              <div className="flex flex-col">
+                <h1 className={`text-lg md:text-2xl font-black tracking-tight leading-none mb-1 ${isLoggedIn && activeTab === 'home' ? 'text-slate-800' : 'text-white'}`}>Seguro-Defeso Fácil</h1>
+                <p className={`text-[10px] font-black uppercase tracking-widest ${isLoggedIn && activeTab === 'home' ? 'text-blue-600' : 'text-blue-100'}`}>Seu direito, explicado simples</p>
               </div>
             </div>
-          </header>
-        )}
 
-        <main className={`px-5 flex-grow z-20 overflow-y-auto max-w-screen-lg mx-auto w-full ${activeTab === 'home' ? 'pt-48 pb-20' : 'pt-40 pb-20'}`}>
+            <div className="flex items-center gap-2">
+              {!isLoggedIn ? (
+                <button onClick={handleInstallClick} className="flex items-center justify-center p-3 rounded-2xl shadow-lg active:scale-90 transition-all bg-yellow-400 text-blue-900 border-2 border-yellow-500" title="Instalar App">
+                  <Download className="w-6 h-6" />
+                </button>
+              ) : (
+                <button onClick={handleLogout} className="flex items-center justify-center p-3 rounded-2xl shadow-lg active:scale-90 transition-all bg-red-100 text-red-600 border-2 border-red-200" title="Sair">
+                  <LogOut className="w-6 h-6" />
+                </button>
+              )}
+              {isLoggedIn && (
+                <button onClick={() => { playClick(); setActiveTab('profile'); }} className="p-0.5 rounded-full border-2 border-blue-100 shadow-sm overflow-hidden active:scale-90 transition-transform w-12 h-12">
+                  {fisher.photoUrl ? <img src={fisher.photoUrl} alt={fisher.name} className="w-full h-full object-cover" /> : <AnimatedAvatar />}
+                </button>
+              )}
+            </div>
+          </div>
+        </header>
+      )}
+
+      {/* Main Content Area (Scrollable) */}
+      <main className="flex-grow overflow-y-auto px-5 pt-6 pb-40 z-20">
+        <div className="max-w-screen-lg mx-auto w-full">
           {renderContent()}
-        </main>
+        </div>
+      </main>
 
-        {isLoggedIn && (['home', 'calendar', 'profile'].includes(activeTab)) && (
-          <nav className="fixed bottom-14 left-0 right-0 z-40">
-            <div className="max-w-md mx-auto px-4">
-              <div className="bg-white/95 backdrop-blur-xl border border-slate-100 shadow-2xl flex items-center justify-around p-3 rounded-[3rem]">
-                <button onClick={() => { playClick(); setActiveTab('home'); }} className={`flex flex-col items-center gap-1 px-5 py-2 rounded-2xl transition-all ${activeTab === 'home' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
-                  <HomeIcon className="w-7 h-7" /><span className="text-[10px] font-black">Início</span>
-                </button>
-                <button onClick={() => { playClick(); setActiveTab('calendar'); }} className={`flex flex-col items-center gap-1 px-5 py-2 rounded-2xl transition-all ${activeTab === 'calendar' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
-                  <Calendar className="w-7 h-7" /><span className="text-[10px] font-black">Defesos</span>
-                </button>
-                <button onClick={() => { playClick(); setActiveTab('profile'); }} className={`flex flex-col items-center gap-1 px-5 py-2 rounded-2xl transition-all ${activeTab === 'profile' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
-                  <User className="w-7 h-7" /><span className="text-[10px] font-black">Perfil</span>
-                </button>
-              </div>
+      {/* Persistent Bottom Navigation */}
+      {isLoggedIn && (['home', 'calendar', 'profile'].includes(activeTab)) && (
+        <nav className="fixed bottom-14 left-0 right-0 z-40">
+          <div className="max-w-md mx-auto px-4">
+            <div className="bg-white/95 backdrop-blur-xl border border-slate-100 shadow-2xl flex items-center justify-around p-3 rounded-[3rem]">
+              <button onClick={() => { playClick(); setActiveTab('home'); }} className={`flex flex-col items-center gap-1 px-5 py-2 rounded-2xl transition-all ${activeTab === 'home' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                <HomeIcon className="w-7 h-7" /><span className="text-[10px] font-black">Início</span>
+              </button>
+              <button onClick={() => { playClick(); setActiveTab('calendar'); }} className={`flex flex-col items-center gap-1 px-5 py-2 rounded-2xl transition-all ${activeTab === 'calendar' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                <Calendar className="w-7 h-7" /><span className="text-[10px] font-black">Defesos</span>
+              </button>
+              <button onClick={() => { playClick(); setActiveTab('profile'); }} className={`flex flex-col items-center gap-1 px-5 py-2 rounded-2xl transition-all ${activeTab === 'profile' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                <User className="w-7 h-7" /><span className="text-[10px] font-black">Perfil</span>
+              </button>
             </div>
-          </nav>
-        )}
+          </div>
+        </nav>
+      )}
 
-        {activeTab !== 'insuranceRequest' && (
-          <footer className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t-2 border-yellow-500 z-50 h-14 shadow-inner">
-            <div className="max-w-screen-lg mx-auto flex items-center justify-center gap-3 h-full">
-              <ShieldCheck className="w-6 h-6 text-blue-900" />
-              <p className="text-blue-900 font-black text-xs text-center">
-                O Pedido Seguro-Defeso é gratuito. <strong>Não pague taxas.</strong>
-              </p>
-            </div>
-          </footer>
-        )}
-      </div>
+      {/* Safety Footer Message */}
+      {activeTab !== 'insuranceRequest' && (
+        <footer className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t-2 border-yellow-500 z-50 h-14 shadow-inner">
+          <div className="max-w-screen-lg mx-auto flex items-center justify-center gap-3 h-full">
+            <ShieldCheck className="w-6 h-6 text-blue-900" />
+            <p className="text-blue-900 font-black text-xs text-center">
+              O Pedido Seguro-Defeso é gratuito. <strong>Não pague taxas.</strong>
+            </p>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };
