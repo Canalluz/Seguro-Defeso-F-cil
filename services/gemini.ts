@@ -1,7 +1,11 @@
-
 import { GoogleGenAI, Modality } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Safe way to get API Key in Vite/Vercel
+const apiKey = (typeof process !== 'undefined' ? process.env?.API_KEY : null) ||
+  (import.meta as any).env?.VITE_GEMINI_API_KEY ||
+  "";
+
+const ai = new GoogleGenAI({ apiKey });
 
 function decode(base64: string) {
   const binaryString = atob(base64);

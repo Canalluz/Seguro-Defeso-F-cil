@@ -6,6 +6,7 @@ export interface FisherData {
   cpf?: string;
   securityMode?: 'biometric' | 'pin';
   pin?: string;
+  photoUrl?: string;
 }
 
 export interface DefesoInfo {
