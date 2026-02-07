@@ -12,27 +12,40 @@ export const FaceScanner: React.FC<FaceScannerProps> = ({ mode, onScanComplete }
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [status, setStatus] = useState<string>('Inicializando biometria...');
+    const [status, setStatus] = useState<string>('Ligando Câmera...');
     const [progress, setProgress] = useState(0);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isAiReady, setIsAiReady] = useState(FaceApiService.isInitialized);
     const detectionRef = useRef<any>(null);
 
     useEffect(() => {
         const init = async () => {
-            const timeout = setTimeout(() => {
-                if (!stream && !error) {
-                    setError("O sistema de biometria está demorando muito para iniciar. Verifique sua conexão ou tente novamente.");
-                }
-            }, 12000); // 12 seconds timeout
+            // Start camera immediately - don't wait for models
+            setStatus('Ligando Câmera...');
+            startCamera();
 
-            try {
-                await FaceApiService.init();
-                clearTimeout(timeout);
-                await startCamera();
-            } catch (err) {
-                console.error("Initialization error:", err);
-                clearTimeout(timeout);
-                setError("Erro ao carregar biometria. Verifique sua conexão.");
+            // Load AI models in parallel
+            if (!FaceApiService.isInitialized) {
+                setStatus('Carregando modelos de IA...');
+                const timeout = setTimeout(() => {
+                    if (!FaceApiService.isInitialized && !error) {
+                        setError("O sistema de biometria está demorando para carregar os modelos de IA. Verifique sua conexão.");
+                    }
+                }, 20000); // 20 seconds for models on Vercel
+
+                try {
+                    await FaceApiService.init();
+                    clearTimeout(timeout);
+                    setIsAiReady(true);
+                    setStatus('IA Carregada! Centralize o rosto.');
+                } catch (err) {
+                    console.error("AI Init error:", err);
+                    clearTimeout(timeout);
+                    setError("Erro ao carregar inteligência artificial. Tente recarregar a página.");
+                }
+            } else {
+                setIsAiReady(true);
+                setStatus('Biometria pronta! Centralize o rosto.');
             }
         };
         init();

@@ -3,24 +3,31 @@ import * as faceapi from '@vladmandic/face-api';
 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/vladmandic/face-api/model/';
 
 export class FaceApiService {
-    private static isInitialized = false;
+    public static isInitialized = false;
+    private static initPromise: Promise<void> | null = null;
 
     static async init() {
         if (this.isInitialized) return;
+        if (this.initPromise) return this.initPromise;
 
-        try {
-            await Promise.all([
-                faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-                faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
-            ]);
-            this.isInitialized = true;
-            console.log('FaceAPI models loaded successfully');
-        } catch (error) {
-            console.error('Error loading FaceAPI models:', error);
-            throw error;
-        }
+        this.initPromise = (async () => {
+            try {
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
+                ]);
+                this.isInitialized = true;
+                console.log('FaceAPI models loaded successfully');
+            } catch (error) {
+                console.error('Error loading FaceAPI models:', error);
+                this.initPromise = null; // Allow retry
+                throw error;
+            }
+        })();
+
+        return this.initPromise;
     }
 
     static async detectFace(videoElement: HTMLVideoElement) {
