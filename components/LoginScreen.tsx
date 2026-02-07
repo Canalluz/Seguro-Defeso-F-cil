@@ -49,13 +49,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 setIsScanning(false);
             }
         } else {
-            // Fallback for missing descriptor (should not happen with new setup)
+            // SECURITY: Remove automatic fallback for missing descriptor.
+            // If the user has no biometric data stored, they MUST use PIN or re-register.
+            playError();
+            setLoginFeedback("Biometria não cadastrada. Por favor, use seu PIN ou registre seu rosto novamente.");
             setIsScanning(false);
-            setIsVerified(true);
-            playSuccess();
-            setTimeout(() => {
-                onLoginSuccess();
-            }, 1500);
         }
     };
 

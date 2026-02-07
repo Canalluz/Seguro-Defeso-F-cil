@@ -84,9 +84,12 @@ export class FaceApiService {
 
     static compareFaces(descriptor1: Float32Array, descriptor2: Float32Array) {
         const distance = faceapi.euclideanDistance(descriptor1, descriptor2);
-        // Standard threshold is 0.6, lower is more strict
-        const threshold = 0.6; // Relaxed slightly to 0.6 for better UX on mobile
-        const similarity = Math.max(0, 1 - (distance / threshold)) * 100;
+        // Stricter threshold: 0.45 (Standard is 0.6)
+        // Values closer to 0 mean more similar.
+        const threshold = 0.45;
+        const similarity = Math.max(0, 1 - (distance / 0.7)) * 100; // Adjusted for display
+
+        console.log(`[FaceAPI] Comparison distance: ${distance.toFixed(4)} (Threshold: ${threshold})`);
 
         return {
             match: distance < threshold,
