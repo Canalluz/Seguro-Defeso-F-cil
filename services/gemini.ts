@@ -34,42 +34,53 @@ async function decodeAudioData(
 
 let globalAudioContext: AudioContext | null = null;
 
+// Cache for TTS responses
+const audioCache = new Map<string, AudioBuffer>();
+
 export const speakExplanation = async (text: string) => {
   try {
     if (!globalAudioContext) {
       globalAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
     }
-    
+
     if (globalAudioContext.state === 'suspended') {
       await globalAudioContext.resume();
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
-      contents: [{ parts: [{ text: `Fale de forma RÁPIDA, clara e simples para o pescador: ${text}` }] }],
-      config: {
-        responseModalities: [Modality.AUDIO],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Kore' },
+    let audioBuffer = audioCache.get(text);
+
+    if (!audioBuffer) {
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash-preview-tts",
+        contents: [{ parts: [{ text: `Fale de forma RÁPIDA, clara e simples para o pescador: ${text}` }] }],
+        config: {
+          responseModalities: [Modality.AUDIO],
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: { voiceName: 'Kore' },
+            },
           },
         },
-      },
-    });
+      });
 
-    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (base64Audio && globalAudioContext) {
-      const audioBuffer = await decodeAudioData(
-        decode(base64Audio),
-        globalAudioContext,
-        24000,
-        1,
-      );
+      const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      if (base64Audio && globalAudioContext) {
+        audioBuffer = await decodeAudioData(
+          decode(base64Audio),
+          globalAudioContext,
+          24000,
+          1,
+        );
+        audioCache.set(text, audioBuffer);
+      }
+    }
+
+    if (audioBuffer && globalAudioContext) {
       const source = globalAudioContext.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(globalAudioContext.destination);
       source.start();
-      
+
       return new Promise((resolve) => {
         source.onended = resolve;
       });
