@@ -453,7 +453,7 @@ const App: React.FC = () => {
           </header>
         )}
 
-        <main className={`px-5 flex-grow z-20 overflow-y-auto max-w-screen-lg mx-auto w-full ${activeTab === 'home' ? 'mt-12' : 'mt-8'}`}>
+        <main className={`px-5 flex-grow z-20 overflow-y-auto max-w-screen-lg mx-auto w-full ${activeTab === 'home' ? 'mt-24' : 'mt-20'}`}>
           {renderContent()}
         </main>
 
