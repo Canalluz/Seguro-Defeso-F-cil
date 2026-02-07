@@ -7,6 +7,7 @@ export interface FisherData {
   securityMode?: 'biometric' | 'pin';
   pin?: string;
   photoUrl?: string;
+  faceDescriptor?: number[]; // Stored as number array for JSON compatibility
 }
 
 export interface DefesoInfo {

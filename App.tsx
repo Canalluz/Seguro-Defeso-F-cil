@@ -126,8 +126,8 @@ const App: React.FC = () => {
     setActiveTab('biometricSetup');
   };
 
-  const handleRegistrationComplete = (mode: 'biometric' | 'pin', pin?: string, photo?: string) => {
-    const finalData = { ...formData, securityMode: mode, pin, photoUrl: photo };
+  const handleRegistrationComplete = (mode: 'biometric' | 'pin', pin?: string, photo?: string, descriptor?: number[]) => {
+    const finalData = { ...formData, securityMode: mode, pin, photoUrl: photo, faceDescriptor: descriptor };
     setFormData(finalData);
     localStorage.setItem('fisherData', JSON.stringify(finalData));
 
@@ -195,6 +195,7 @@ const App: React.FC = () => {
               securityMode={formData.securityMode}
               storedPin={formData.pin}
               userPhoto={formData.photoUrl}
+              storedDescriptor={formData.faceDescriptor}
               onLoginSuccess={handleLoginSuccess}
             />
           );

@@ -1,9 +1,10 @@
+import React, { useState } from 'react';
 import { ShieldCheck, ScanFace, GripHorizontal, ChevronRight, Lock, ArrowLeft } from 'lucide-react';
 import { playClick, playSuccess, playError } from '../services/audio';
 import { FaceScanner } from './FaceScanner';
 
 interface BiometricSetupProps {
-    onComplete: (mode: 'biometric' | 'pin', pin?: string, photo?: string) => void;
+    onComplete: (mode: 'biometric' | 'pin', pin?: string, photo?: string, descriptor?: number[]) => void;
 }
 
 export const BiometricSetup: React.FC<BiometricSetupProps> = ({ onComplete }) => {
@@ -16,9 +17,11 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({ onComplete }) =>
         setStep('face-scan');
     };
 
-    const handleScanComplete = (photo?: string) => {
+    const handleScanComplete = (photo?: string, descriptor?: Float32Array) => {
         playSuccess();
-        onComplete('biometric', undefined, photo);
+        // Convert Float32Array to number array for persistence
+        const descriptorArray = descriptor ? Array.from(descriptor) : undefined;
+        onComplete('biometric', undefined, photo, descriptorArray);
     };
 
     const handlePinSubmit = () => {

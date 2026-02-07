@@ -1,33 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { ScanFace, GripHorizontal, User, LockKeyhole } from 'lucide-react';
+import { ScanFace, GripHorizontal, User, LockKeyhole, AlertCircle } from 'lucide-react';
 import { playClick, playSuccess, playError } from '../services/audio';
 import { FaceScanner } from './FaceScanner';
+import { FaceApiService } from '../services/faceApiService';
 
 interface LoginScreenProps {
     username: string;
     securityMode?: 'biometric' | 'pin';
     storedPin?: string;
     userPhoto?: string;
+    storedDescriptor?: number[];
     onLoginSuccess: () => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ username, securityMode = 'biometric', storedPin, userPhoto, onLoginSuccess }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({
+    username,
+    securityMode = 'biometric',
+    storedPin,
+    userPhoto,
+    storedDescriptor,
+    onLoginSuccess
+}) => {
     const [pinInput, setPinInput] = useState('');
     const [isScanning, setIsScanning] = useState(securityMode === 'biometric'); // Auto-start if biometric
     const [isVerified, setIsVerified] = useState(false);
+    const [loginFeedback, setLoginFeedback] = useState<string | null>(null);
 
     const handleBiometricAuth = () => {
+        setLoginFeedback(null);
         setIsScanning(true);
     };
 
-    const handleScanComplete = () => {
-        setIsScanning(false);
-        setIsVerified(true);
-        playSuccess();
-        // Short delay to show the welcome message with name
-        setTimeout(() => {
-            onLoginSuccess();
-        }, 1500);
+    const handleScanComplete = (photo?: string, descriptor?: Float32Array) => {
+        if (storedDescriptor && descriptor) {
+            const storedArray = new Float32Array(storedDescriptor);
+            const result = FaceApiService.compareFaces(descriptor, storedArray);
+
+            if (result.match) {
+                setIsScanning(false);
+                setIsVerified(true);
+                playSuccess();
+                setTimeout(() => {
+                    onLoginSuccess();
+                }, 1500);
+            } else {
+                playError();
+                setLoginFeedback("Rosto não reconhecido. Tente novamente ou registre-se.");
+                setIsScanning(false);
+            }
+        } else {
+            // Fallback for missing descriptor (should not happen with new setup)
+            setIsScanning(false);
+            setIsVerified(true);
+            playSuccess();
+            setTimeout(() => {
+                onLoginSuccess();
+            }, 1500);
+        }
     };
 
     const handlePinChange = (val: string) => {
@@ -43,6 +72,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ username, securityMode
                 }, 1000);
             } else {
                 playError();
+                setLoginFeedback("PIN incorreto. Tente novamente.");
                 setTimeout(() => setPinInput(''), 500);
             }
         }
@@ -79,18 +109,33 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ username, securityMode
                         </p>
                     </div>
                 ) : (
-                    // Fallback if scanning was cancelled or failed (though currently face scanner mocks success)
-                    <button
-                        onClick={handleBiometricAuth}
-                        className="flex flex-col items-center gap-4 bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-100 active:scale-95 transition-transform"
-                    >
-                        <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 shadow-inner">
-                            <ScanFace className="w-12 h-12" />
-                        </div>
-                        <span className="font-bold text-slate-600 text-lg">
-                            Tentar Novamente
-                        </span>
-                    </button>
+                    <div className="flex flex-col items-center gap-6">
+                        {loginFeedback && (
+                            <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-top-2">
+                                <div className="bg-red-50 text-red-600 p-4 rounded-2xl border border-red-100 flex items-center gap-3">
+                                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                    <p className="text-xs font-bold leading-tight">{loginFeedback}</p>
+                                </div>
+                                <button
+                                    onClick={() => window.location.reload()} // Simplest way to go back to landing in this SPA setup without complex prop drilling for now, or I can use a standard way if I have access to setActiveTab
+                                    className="text-blue-600 font-bold text-sm underline active:scale-95 transition-transform"
+                                >
+                                    Voltar ao Início / Criar Conta
+                                </button>
+                            </div>
+                        )}
+                        <button
+                            onClick={handleBiometricAuth}
+                            className="flex flex-col items-center gap-4 bg-white p-10 rounded-[4rem] shadow-2xl border border-slate-100 active:scale-95 transition-transform group"
+                        >
+                            <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-blue-200 group-hover:scale-110 transition-transform">
+                                <ScanFace className="w-12 h-12" />
+                            </div>
+                            <span className="font-black text-slate-700 text-lg">
+                                Entrar com Face ID
+                            </span>
+                        </button>
+                    </div>
                 )
             ) : (
                 <div className="w-full max-w-sm bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-100">
