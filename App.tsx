@@ -400,7 +400,7 @@ const App: React.FC = () => {
     <div className={`min-h-screen flex flex-col pb-44 ${isLoggedIn && activeTab === 'home' ? 'bg-gradient-to-br from-blue-100 to-green-100' : 'bg-slate-50'}`}>
       <div className="w-full max-w-screen-xl mx-auto flex flex-col min-h-screen relative">
         {activeTab !== 'loginBiometrics' && activeTab !== 'registrationBiometrics' && (
-          <header className={`${isLoggedIn && activeTab === 'home' ? 'bg-white/95 backdrop-blur-xl' : 'bg-blue-700 text-white'} p-6 rounded-b-[3rem] shadow-xl sticky top-0 z-50 transition-all duration-500`}>
+          <header className={`${isLoggedIn && activeTab === 'home' ? 'bg-white/95 backdrop-blur-xl' : 'bg-blue-700 text-white'} p-6 rounded-b-[3rem] shadow-xl fixed top-0 left-0 right-0 z-50 transition-all duration-500`}>
             <div className="flex items-center justify-between max-w-screen-lg mx-auto w-full gap-4">
               <div className="flex items-center gap-3">
                 {isLoggedIn && activeTab !== 'home' && (
@@ -453,7 +453,7 @@ const App: React.FC = () => {
           </header>
         )}
 
-        <main className={`px-5 flex-grow z-20 overflow-y-auto max-w-screen-lg mx-auto w-full ${activeTab === 'home' ? 'mt-24' : 'mt-20'}`}>
+        <main className={`px-5 flex-grow z-20 overflow-y-auto max-w-screen-lg mx-auto w-full ${activeTab === 'home' ? 'pt-48 pb-20' : 'pt-40 pb-20'}`}>
           {renderContent()}
         </main>
 
