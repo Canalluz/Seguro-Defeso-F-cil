@@ -200,10 +200,10 @@ const App: React.FC = () => {
         case 'landing':
         default:
           return (
-            <div className="flex flex-col h-full animate-in fade-in duration-700 relative">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-12 h-full lg:max-w-5xl lg:mx-auto animate-in fade-in duration-700 relative">
               {/* Hero Image Section */}
-              <div className="flex-1 flex flex-col items-center justify-center pt-8 pb-4">
-                <div className="w-64 h-64 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white mb-6 relative group">
+              <div className="flex-1 flex flex-col items-center justify-center pt-8 pb-4 lg:pt-0 lg:pb-0">
+                <div className="w-56 h-56 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white mb-6 relative group">
                   <img
                     src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=2070&auto=format&fit=crop"
                     alt="Pescador Artesanal"
@@ -212,16 +212,16 @@ const App: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 to-transparent"></div>
                 </div>
 
-                <div className="text-center px-6">
-                  <h2 className="text-3xl font-black text-slate-800 leading-tight tracking-tight mb-2">
+                <div className="text-center px-6 lg:text-left lg:px-0">
+                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-800 leading-tight tracking-tight mb-2">
                     Seu Seguro-Defeso <br /> <span className="text-blue-600">Fácil e Seguro</span>
                   </h2>
-                  <p className="text-lg text-slate-500 font-bold leading-tight">Ajuda gratuita para o pescador.</p>
+                  <p className="text-lg md:text-xl text-slate-500 font-bold leading-tight">Ajuda gratuita para o pescador.</p>
                 </div>
               </div>
 
               {/* Bottom Actions Section */}
-              <div className="bg-white rounded-t-[3rem] p-8 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] space-y-4">
+              <div className="bg-white rounded-t-[3rem] lg:rounded-[3rem] p-8 lg:p-12 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] lg:shadow-2xl space-y-4 lg:w-[450px]">
                 <button onClick={() => { playClick(); setActiveTab('login'); }} className="w-full bg-blue-600 text-white py-5 rounded-[2rem] font-black text-2xl shadow-xl shadow-blue-200 flex items-center justify-center gap-4 active:scale-95 transition-all">
                   <LogIn className="w-7 h-7" /> Já sou cadastrado
                 </button>
@@ -329,9 +329,9 @@ const App: React.FC = () => {
               </button>
             </section>
 
-            <div className="grid grid-cols-1 gap-4">
-              <button onClick={() => { playClick(); setActiveTab('insuranceRequest'); }} className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all">
-                <div className="bg-blue-100 p-4 rounded-2xl"><FileText className="w-10 h-10 text-blue-700" /></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button onClick={() => { playClick(); setActiveTab('insuranceRequest'); }} className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all md:col-span-2 group hover:border-blue-200">
+                <div className="bg-blue-100 p-4 rounded-2xl group-hover:scale-105 transition-transform"><FileText className="w-10 h-10 text-blue-700" /></div>
                 <div className="text-left">
                   <h4 className="text-2xl font-black text-slate-800">Pedir Seguro</h4>
                   <p className="text-slate-500 font-bold">Novo requerimento</p>
@@ -339,8 +339,8 @@ const App: React.FC = () => {
                 <ChevronRight className="ml-auto w-8 h-8 text-slate-300" />
               </button>
 
-              <button onClick={() => { playClick(); setActiveTab('wallet'); }} className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all">
-                <div className="bg-green-100 p-4 rounded-2xl"><FileSearch className="w-10 h-10 text-green-700" /></div>
+              <button onClick={() => { playClick(); setActiveTab('wallet'); }} className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all group hover:border-green-200">
+                <div className="bg-green-100 p-4 rounded-2xl group-hover:scale-105 transition-transform"><FileSearch className="w-10 h-10 text-green-700" /></div>
                 <div className="text-left">
                   <h3 className="font-black text-slate-800 text-lg">Meus Documentos</h3>
                   <p className="text-slate-400 font-bold text-xs">Organize seus arquivos</p>
@@ -350,23 +350,24 @@ const App: React.FC = () => {
 
               <button
                 onClick={() => { playClick(); setActiveTab('reap'); }}
-                className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all text-left"
+                className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all text-left group hover:border-emerald-200"
               >
-                <div className="bg-emerald-100 p-4 rounded-2xl"><ClipboardList className="w-10 h-10 text-emerald-600" /></div>
+                <div className="bg-emerald-100 p-4 rounded-2xl group-hover:scale-105 transition-transform"><ClipboardList className="w-10 h-10 text-emerald-600" /></div>
                 <div>
                   <h3 className="font-black text-slate-800 text-lg leading-tight">REAP</h3>
-                  <p className="text-slate-400 font-bold text-xs mt-1">Relatório de Exercício da <br /> Atividade Pesqueira</p>
+                  <p className="text-slate-400 font-bold text-xs mt-1">Relatório de Atividade Pesqueira</p>
                 </div>
                 <ChevronRight className="ml-auto w-8 h-8 text-slate-300" />
               </button>
+
               <button
                 onClick={() => { playClick(); setActiveTab('inss'); }}
-                className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all text-left"
+                className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all text-left group hover:border-orange-200"
               >
-                <div className="bg-orange-100 p-4 rounded-2xl"><Landmark className="w-10 h-10 text-orange-600" /></div>
+                <div className="bg-orange-100 p-4 rounded-2xl group-hover:scale-105 transition-transform"><Landmark className="w-10 h-10 text-orange-600" /></div>
                 <div>
                   <h3 className="font-black text-slate-800 text-lg leading-tight">INSS</h3>
-                  <p className="text-slate-400 font-bold text-xs mt-1">Contribuição <br /> Previdenciária</p>
+                  <p className="text-slate-400 font-bold text-xs mt-1">Contribuição Previdenciária</p>
                 </div>
                 <ChevronRight className="ml-auto w-8 h-8 text-slate-300" />
               </button>
@@ -396,76 +397,86 @@ const App: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col pb-44 ${isLoggedIn && activeTab === 'home' ? 'bg-gradient-to-br from-blue-100 to-green-100' : 'bg-slate-50'}`}>
-      {activeTab !== 'loginBiometrics' && activeTab !== 'registrationBiometrics' && (
-        <header className={`${isLoggedIn && activeTab === 'home' ? 'bg-white/95 backdrop-blur-xl' : 'bg-blue-700 text-white'} p-6 rounded-b-[3rem] shadow-xl sticky top-0 z-50 transition-all duration-500`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`${isLoggedIn && activeTab === 'home' ? 'bg-blue-600' : 'bg-white/20'} p-3 rounded-2xl`}>
-                <Fish className="w-8 h-8 text-white" />
+      <div className="w-full max-w-screen-xl mx-auto flex flex-col min-h-screen relative">
+        {activeTab !== 'loginBiometrics' && activeTab !== 'registrationBiometrics' && (
+          <header className={`${isLoggedIn && activeTab === 'home' ? 'bg-white/95 backdrop-blur-xl' : 'bg-blue-700 text-white'} p-6 rounded-b-[3rem] shadow-xl sticky top-0 z-50 transition-all duration-500`}>
+            <div className="flex items-center justify-between max-w-screen-lg mx-auto w-full">
+              <div className="flex items-center gap-3">
+                <div className={`${isLoggedIn && activeTab === 'home' ? 'bg-blue-600' : 'bg-white/20'} p-3 rounded-2xl`}>
+                  <Fish className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <h1 className={`text-xl md:text-2xl font-black tracking-tight leading-none mb-1 ${isLoggedIn && activeTab === 'home' ? 'text-slate-800' : 'text-white'}`}>Seguro-Defeso Fácil</h1>
+                  <p className={`text-[10px] font-black uppercase tracking-widest ${isLoggedIn && activeTab === 'home' ? 'text-blue-600' : 'text-blue-100'}`}>Seu direito, explicado simples</p>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <h1 className={`text-2xl font-black tracking-tight leading-none mb-1 ${isLoggedIn && activeTab === 'home' ? 'text-slate-800' : 'text-white'}`}>Seguro-Defeso Fácil</h1>
-                <p className={`text-[10px] font-black uppercase tracking-widest ${isLoggedIn && activeTab === 'home' ? 'text-blue-600' : 'text-blue-100'}`}>Seu direito, explicado simples</p>
+
+              <div className="flex items-center gap-2">
+                {!isLoggedIn ? (
+                  <button
+                    onClick={handleInstallClick}
+                    className="flex items-center justify-center p-3 rounded-2xl shadow-lg active:scale-90 transition-all bg-yellow-400 text-blue-900 border-2 border-yellow-500"
+                    title="Instalar App"
+                  >
+                    <Download className="w-6 h-6" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center justify-center p-3 rounded-2xl shadow-lg active:scale-90 transition-all bg-red-100 text-red-600 border-2 border-red-200"
+                    title="Sair"
+                  >
+                    <LogOut className="w-6 h-6" />
+                  </button>
+                )}
+
+                {isLoggedIn && (
+                  <button onClick={() => { playClick(); setActiveTab('profile'); }} className="p-0.5 rounded-full border-2 border-blue-100 shadow-sm overflow-hidden active:scale-90 transition-transform w-12 h-12">
+                    {fisher.photoUrl ? (
+                      <img src={fisher.photoUrl} alt={fisher.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <AnimatedAvatar />
+                    )}
+                  </button>
+                )}
               </div>
             </div>
+          </header>
+        )}
 
-            <div className="flex items-center gap-2">
+        <main className={`px-5 flex-grow z-20 overflow-y-auto max-w-screen-lg mx-auto w-full ${activeTab === 'home' ? 'mt-4' : 'mt-2'}`}>
+          {renderContent()}
+        </main>
 
-
-              {!isLoggedIn ? (
-                <button
-                  onClick={handleInstallClick}
-                  className="flex items-center justify-center p-3 rounded-2xl shadow-lg active:scale-90 transition-all bg-yellow-400 text-blue-900 border-2 border-yellow-500"
-                  title="Instalar App"
-                >
-                  <Download className="w-6 h-6" />
+        {isLoggedIn && (['home', 'calendar', 'profile'].includes(activeTab)) && (
+          <nav className="fixed bottom-14 left-0 right-0 z-40">
+            <div className="max-w-md mx-auto px-4">
+              <div className="bg-white/95 backdrop-blur-xl border border-slate-100 shadow-2xl flex items-center justify-around p-3 rounded-[3rem]">
+                <button onClick={() => { playClick(); setActiveTab('home'); }} className={`flex flex-col items-center gap-1 px-5 py-2 rounded-2xl transition-all ${activeTab === 'home' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                  <HomeIcon className="w-7 h-7" /><span className="text-[10px] font-black">Início</span>
                 </button>
-              ) : (
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center justify-center p-3 rounded-2xl shadow-lg active:scale-90 transition-all bg-red-100 text-red-600 border-2 border-red-200"
-                  title="Sair"
-                >
-                  <LogOut className="w-6 h-6" />
+                <button onClick={() => { playClick(); setActiveTab('calendar'); }} className={`flex flex-col items-center gap-1 px-5 py-2 rounded-2xl transition-all ${activeTab === 'calendar' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                  <Calendar className="w-7 h-7" /><span className="text-[10px] font-black">Defesos</span>
                 </button>
-              )}
-
-              {isLoggedIn && (
-                <button onClick={() => { playClick(); setActiveTab('profile'); }} className="p-0.5 rounded-full border-2 border-blue-100 shadow-sm overflow-hidden active:scale-90 transition-transform w-12 h-12">
-                  <AnimatedAvatar />
+                <button onClick={() => { playClick(); setActiveTab('profile'); }} className={`flex flex-col items-center gap-1 px-5 py-2 rounded-2xl transition-all ${activeTab === 'profile' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
+                  <User className="w-7 h-7" /><span className="text-[10px] font-black">Perfil</span>
                 </button>
-              )}
+              </div>
             </div>
-          </div>
-        </header>
-      )}
+          </nav>
+        )}
 
-      <main className={`px-5 flex-grow z-20 overflow-y-auto ${activeTab === 'home' ? 'mt-4' : 'mt-2'}`}>
-        {renderContent()}
-      </main>
-
-      {isLoggedIn && (['home', 'calendar', 'profile'].includes(activeTab)) && (
-        <nav className="fixed bottom-14 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-2xl flex items-center justify-around p-4 z-40 rounded-t-[3rem]">
-          <button onClick={() => { playClick(); setActiveTab('home'); }} className={`flex flex-col items-center gap-1 px-6 py-3 rounded-2xl transition-all ${activeTab === 'home' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
-            <HomeIcon className="w-8 h-8" /><span className="text-[10px] font-black">Início</span>
-          </button>
-          <button onClick={() => { playClick(); setActiveTab('calendar'); }} className={`flex flex-col items-center gap-1 px-6 py-3 rounded-2xl transition-all ${activeTab === 'calendar' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
-            <Calendar className="w-8 h-8" /><span className="text-[10px] font-black">Defesos</span>
-          </button>
-          <button onClick={() => { playClick(); setActiveTab('profile'); }} className={`flex flex-col items-center gap-1 px-6 py-3 rounded-2xl transition-all ${activeTab === 'profile' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}>
-            <User className="w-8 h-8" /><span className="text-[10px] font-black">Perfil</span>
-          </button>
-        </nav>
-      )}
-
-      {activeTab !== 'insuranceRequest' && (
-        <footer className="fixed bottom-0 left-0 right-0 bg-yellow-400 p-4 border-t-2 border-yellow-500 flex items-center justify-center gap-3 z-50 h-14 shadow-inner">
-          <ShieldCheck className="w-6 h-6 text-blue-900" />
-          <p className="text-blue-900 font-black text-xs text-center">
-            O Pedido Seguro-Defeso é gratuito. <strong>Não pague taxas.</strong>
-          </p>
-        </footer>
-      )}
+        {activeTab !== 'insuranceRequest' && (
+          <footer className="fixed bottom-0 left-0 right-0 bg-yellow-400 border-t-2 border-yellow-500 z-50 h-14 shadow-inner">
+            <div className="max-w-screen-lg mx-auto flex items-center justify-center gap-3 h-full">
+              <ShieldCheck className="w-6 h-6 text-blue-900" />
+              <p className="text-blue-900 font-black text-xs text-center">
+                O Pedido Seguro-Defeso é gratuito. <strong>Não pague taxas.</strong>
+              </p>
+            </div>
+          </footer>
+        )}
+      </div>
     </div>
   );
 };

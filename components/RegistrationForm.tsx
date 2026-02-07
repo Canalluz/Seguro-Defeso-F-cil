@@ -31,7 +31,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onNext, onBa
     };
 
     return (
-        <div className="bg-white rounded-[3rem] p-8 shadow-2xl border border-slate-100 mt-6 animate-in slide-in-from-right duration-500 pb-32">
+        <div className="bg-white rounded-[3rem] p-8 shadow-2xl border border-slate-100 mt-6 animate-in slide-in-from-right duration-500 pb-32 max-w-xl mx-auto w-full">
             <div className="text-center mb-8">
                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 shadow-inner">
                     <UserPlus className="w-10 h-10" />

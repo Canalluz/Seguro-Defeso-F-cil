@@ -384,14 +384,14 @@ export const InsuranceRequest: React.FC<InsuranceRequestProps> = ({ fisher, defe
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full max-w-4xl mx-auto w-full">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
                 <button onClick={handleBack} className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 active:scale-90 transition-all">
                     <ChevronLeft className="w-6 h-6 text-slate-700" />
                 </button>
                 <div className="flex-1">
-                    <h2 className="text-xl font-black text-slate-800 leading-none">Pedir Seguro</h2>
+                    <h2 className="text-xl md:text-2xl font-black text-slate-800 leading-none">Pedir Seguro</h2>
                     <p className="text-xs font-bold text-slate-400">Passo {step} de 5</p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center font-black text-blue-600 border-4 border-white shadow-sm">
@@ -415,7 +415,7 @@ export const InsuranceRequest: React.FC<InsuranceRequestProps> = ({ fisher, defe
 
             {/* Footer Actions */}
             <div className="fixed bottom-0 left-0 right-0 p-6 bg-white border-t border-slate-100 rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50">
-                <div className="flex gap-4">
+                <div className="max-w-4xl mx-auto flex gap-4">
                     {step > 1 && (
                         <button onClick={handleBack} className="px-8 py-5 bg-slate-100 text-slate-500 rounded-3xl font-black text-lg active:scale-95 transition-all">
                             Voltar

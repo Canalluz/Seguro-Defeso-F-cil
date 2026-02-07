@@ -163,7 +163,7 @@ export const DocumentWallet: React.FC<DocumentWalletProps> = ({ onBack }) => {
     };
 
     return (
-        <div className="pb-24 animate-in slide-in-from-right duration-500">
+        <div className="pb-24 animate-in slide-in-from-right duration-500 max-w-4xl mx-auto w-full">
             {/* Header with Back Button */}
             <div className="bg-white rounded-[3rem] p-8 shadow-xl border border-slate-100 text-center relative mb-6">
                 {onBack && (
@@ -171,7 +171,7 @@ export const DocumentWallet: React.FC<DocumentWalletProps> = ({ onBack }) => {
                         onClick={() => { playClick(); onBack(); }}
                         className="absolute left-6 top-8 py-2 px-4 rounded-full bg-slate-100 text-slate-600 font-bold text-sm flex items-center gap-2 active:scale-95 transition-all shadow-sm"
                     >
-                        <ArrowLeft className="w-4 h-4" /> Voltar
+                        <ArrowLeft className="w-4 h-4" /> <span className="hidden md:inline">Voltar</span>
                     </button>
                 )}
                 <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-600 shadow-inner">
@@ -181,7 +181,7 @@ export const DocumentWallet: React.FC<DocumentWalletProps> = ({ onBack }) => {
                 <p className="text-slate-500 font-bold">Documentos salvos no seu aparelho.</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {renderDocCard('rgp', 'Carteira RGP')}
                 {renderDocCard('cpf', 'CPF / RG')}
                 {renderDocCard('address', 'Comprovante de Residência')}

@@ -118,7 +118,7 @@ export const AccountData: React.FC<AccountDataProps> = ({ fisher, onLogout }) =>
     };
 
     return (
-        <div className="pb-24 animate-in slide-in-from-bottom-4 duration-500">
+        <div className="pb-24 animate-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto w-full">
             {/* Camera Overlay */}
             {isCameraOpen && (
                 <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
