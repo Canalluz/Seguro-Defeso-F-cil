@@ -3,7 +3,7 @@ import { ScanFace, Camera, AlertCircle } from 'lucide-react';
 
 interface FaceScannerProps {
     mode: 'setup' | 'verify';
-    onScanComplete: () => void;
+    onScanComplete: (photo?: string) => void;
 }
 
 export const FaceScanner: React.FC<FaceScannerProps> = ({ mode, onScanComplete }) => {
@@ -43,6 +43,26 @@ export const FaceScanner: React.FC<FaceScannerProps> = ({ mode, onScanComplete }
         }
     };
 
+    const captureFrame = (): string | undefined => {
+        if (!videoRef.current) return undefined;
+        try {
+            const canvas = document.createElement('canvas');
+            canvas.width = videoRef.current.videoWidth;
+            canvas.height = videoRef.current.videoHeight;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                // Mirror the context to match the mirrored video
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1);
+                ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+                return canvas.toDataURL('image/jpeg', 0.8);
+            }
+        } catch (e) {
+            console.error("Capture failed", e);
+        }
+        return undefined;
+    };
+
     const startScanning = () => {
         let p = 0;
         const interval = setInterval(() => {
@@ -55,7 +75,8 @@ export const FaceScanner: React.FC<FaceScannerProps> = ({ mode, onScanComplete }
 
             if (p >= 100) {
                 clearInterval(interval);
-                onScanComplete();
+                const photo = captureFrame();
+                onScanComplete(photo);
             }
         }, 60); // Total ~3 seconds
     };

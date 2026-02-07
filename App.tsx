@@ -19,7 +19,9 @@ import {
   Fish,
   Headphones,
   Download,
-  Github
+  Github,
+  ClipboardList,
+  Landmark
 } from 'lucide-react';
 import { BiometricAuth } from './components/BiometricAuth';
 import { speakExplanation } from './services/gemini';
@@ -34,14 +36,18 @@ import { FisherData, DefesoInfo } from './types';
 import { playClick, playSuccess, playError } from './services/audio';
 import { fetchDefesoData } from './services/defesoService'; // Import service
 import { AnimatedAvatar } from './components/AnimatedAvatar';
+import { TermsOfUse } from './components/TermsOfUse';
+import { ReapMenu } from './components/ReapMenu';
+import { InssMenu } from './components/InssMenu';
 
-type View = 'landing' | 'registrationForm' | 'biometricSetup' | 'login' | 'home' | 'calendar' | 'profile' | 'insuranceRequest' | 'wallet';
+type View = 'landing' | 'registrationForm' | 'biometricSetup' | 'login' | 'home' | 'calendar' | 'profile' | 'insuranceRequest' | 'wallet' | 'reap' | 'inss';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<View>('landing');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showTerms, setShowTerms] = useState(false);
 
   const [formData, setFormData] = useState<FisherData>({
     name: '',
@@ -98,7 +104,7 @@ const App: React.FC = () => {
   const handleLogout = () => {
     playClick();
     setIsLoggedIn(false);
-    setActiveTab('login');
+    setActiveTab('landing'); // Redirect to Landing page
   };
 
   const handleLoginSuccess = () => {
@@ -113,8 +119,8 @@ const App: React.FC = () => {
     setActiveTab('biometricSetup');
   };
 
-  const handleRegistrationComplete = (mode: 'biometric' | 'pin', pin?: string) => {
-    const finalData = { ...formData, securityMode: mode, pin };
+  const handleRegistrationComplete = (mode: 'biometric' | 'pin', pin?: string, photo?: string) => {
+    const finalData = { ...formData, securityMode: mode, pin, photoUrl: photo };
     setFormData(finalData);
     localStorage.setItem('fisherData', JSON.stringify(finalData));
 
@@ -124,6 +130,7 @@ const App: React.FC = () => {
   };
 
   const fisherPhoto = "https://images.unsplash.com/photo-1516715668466-93ad73070493?auto=format&fit=crop&q=80&w=600&h=600";
+  const defaultAvatar = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200";
 
   const fisher: FisherData = formData;
 
@@ -154,6 +161,10 @@ const App: React.FC = () => {
     loadDefeso();
   }, [formData.region]); // Reload if region changes
 
+  if (showTerms) {
+    return <TermsOfUse onClose={() => setShowTerms(false)} />;
+  }
+
   const renderContent = () => {
     if (!isLoggedIn) {
       switch (activeTab) {
@@ -176,35 +187,55 @@ const App: React.FC = () => {
               username={formData.name}
               securityMode={formData.securityMode}
               storedPin={formData.pin}
+              userPhoto={formData.photoUrl}
               onLoginSuccess={handleLoginSuccess}
             />
           );
         case 'landing':
         default:
           return (
-            <div className="flex flex-col items-center justify-center py-4 space-y-4 animate-in fade-in duration-700">
-              <div className="bg-blue-600 p-6 rounded-[2.5rem] shadow-2xl shadow-blue-200 border-4 border-blue-50/20">
-                <Fish className="w-20 h-20 text-white" />
-              </div>
-              <div className="text-center px-4">
-                <h2 className="text-3xl font-black text-slate-800 leading-tight tracking-tight">
-                  Seu Seguro-Defeso <br /> <span className="text-blue-600">Fácil e Seguro</span>
-                </h2>
-                <p className="mt-2 text-lg text-slate-500 font-bold px-6 leading-tight">Ajuda gratuita para o pescador artesanal.</p>
+            <div className="flex flex-col h-full animate-in fade-in duration-700 relative">
+              {/* Hero Image Section */}
+              <div className="flex-1 flex flex-col items-center justify-center pt-8 pb-4">
+                <div className="w-64 h-64 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white mb-6 relative group">
+                  <img
+                    src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=2070&auto=format&fit=crop"
+                    alt="Pescador Artesanal"
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 to-transparent"></div>
+                </div>
+
+                <div className="text-center px-6">
+                  <h2 className="text-3xl font-black text-slate-800 leading-tight tracking-tight mb-2">
+                    Seu Seguro-Defeso <br /> <span className="text-blue-600">Fácil e Seguro</span>
+                  </h2>
+                  <p className="text-lg text-slate-500 font-bold leading-tight">Ajuda gratuita para o pescador.</p>
+                </div>
               </div>
 
-              <div className="w-full space-y-3 px-4">
+              {/* Bottom Actions Section */}
+              <div className="bg-white rounded-t-[3rem] p-8 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] space-y-4">
                 <button onClick={() => { playClick(); setActiveTab('login'); }} className="w-full bg-blue-600 text-white py-5 rounded-[2rem] font-black text-2xl shadow-xl shadow-blue-200 flex items-center justify-center gap-4 active:scale-95 transition-all">
                   <LogIn className="w-7 h-7" /> Já sou cadastrado
                 </button>
-                <button onClick={() => { playClick(); setActiveTab('registrationForm'); }} className="w-full bg-white text-blue-700 py-5 rounded-[2rem] font-black text-2xl border-4 border-blue-50 flex items-center justify-center gap-4 active:scale-95 transition-all">
+                <button onClick={() => { playClick(); setActiveTab('registrationForm'); }} className="w-full bg-slate-50 text-blue-700 py-5 rounded-[2rem] font-black text-2xl border-2 border-blue-50 flex items-center justify-center gap-4 active:scale-95 transition-all">
                   <UserPlus className="w-7 h-7" /> Começar Agora
                 </button>
-              </div>
 
-              <button onClick={() => { playClick(); handleAudio("Bem-vindo! Toque no botão azul se já tem conta, ou no branco para criar uma nova."); }} className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-6 py-3 rounded-full font-black text-base active:scale-95">
-                <Volume2 className="w-6 h-6" /> Ouvir Ajuda
-              </button>
+                <div className="pt-4 flex flex-col items-center gap-4">
+                  <button
+                    onClick={() => { playClick(); setShowTerms(true); }}
+                    className="text-slate-400 text-xs font-bold underline decoration-slate-300 hover:text-blue-600 transition-colors"
+                  >
+                    Termos de Uso e Política de Privacidade
+                  </button>
+
+                  <button onClick={() => { playClick(); handleAudio("Bem-vindo! Toque no botão azul se já tem conta, ou no branco para criar uma nova."); }} className="flex items-center gap-2 text-indigo-500 font-black text-sm active:scale-95 bg-indigo-50 px-4 py-2 rounded-full">
+                    <Volume2 className="w-4 h-4" /> Ouvir Ajuda
+                  </button>
+                </div>
+              </div>
             </div>
           );
       }
@@ -229,7 +260,11 @@ const App: React.FC = () => {
           <AccountData fisher={fisher} onLogout={handleLogout} />
         );
       case 'wallet':
-        return <DocumentWallet />;
+        return <DocumentWallet onBack={() => setActiveTab('home')} />;
+      case 'reap':
+        return <ReapMenu onBack={() => setActiveTab('home')} />;
+      case 'inss':
+        return <InssMenu onBack={() => setActiveTab('home')} fisher={fisher} />;
       case 'home':
       default:
         return (
@@ -237,9 +272,11 @@ const App: React.FC = () => {
             <section className="bg-white/90 backdrop-blur-md rounded-[2.5rem] p-4 shadow-lg border border-white flex items-center gap-5 mt-4">
               <div className="relative">
                 <div className="w-20 h-20 rounded-3xl overflow-hidden border-4 border-blue-100 shadow-md bg-blue-50">
-                  {/* Fallback to AnimatedAvatar if no photo (Currently static string 'fisherPhoto' is used, need to fix logic later if real upload) */}
-                  {/* For now replacing the static Unsplash image with conditional or just the avatar to demonstrate */}
-                  <AnimatedAvatar />
+                  {fisher.photoUrl ? (
+                    <img src={fisher.photoUrl} alt={fisher.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <AnimatedAvatar />
+                  )}
                 </div>
                 <div className="absolute -bottom-1 -right-1 bg-green-500 p-1.5 rounded-full border-2 border-white">
                   <CheckCircle2 className="w-4 h-4 text-white" />
@@ -299,8 +336,31 @@ const App: React.FC = () => {
               <button onClick={() => { playClick(); setActiveTab('wallet'); }} className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all">
                 <div className="bg-green-100 p-4 rounded-2xl"><FileSearch className="w-10 h-10 text-green-700" /></div>
                 <div className="text-left">
-                  <h4 className="text-2xl font-black text-slate-800">Meus Documentos</h4>
-                  <p className="text-slate-500 font-bold">Organize seus arquivos</p>
+                  <h3 className="font-black text-slate-800 text-lg">Meus Documentos</h3>
+                  <p className="text-slate-400 font-bold text-xs">Organize seus arquivos</p>
+                </div>
+                <ChevronRight className="ml-auto w-8 h-8 text-slate-300" />
+              </button>
+
+              <button
+                onClick={() => { playClick(); setActiveTab('reap'); }}
+                className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all text-left"
+              >
+                <div className="bg-emerald-100 p-4 rounded-2xl"><ClipboardList className="w-10 h-10 text-emerald-600" /></div>
+                <div>
+                  <h3 className="font-black text-slate-800 text-lg leading-tight">REAP</h3>
+                  <p className="text-slate-400 font-bold text-xs mt-1">Relatório de Exercício da <br /> Atividade Pesqueira</p>
+                </div>
+                <ChevronRight className="ml-auto w-8 h-8 text-slate-300" />
+              </button>
+              <button
+                onClick={() => { playClick(); setActiveTab('inss'); }}
+                className="bg-white p-6 rounded-[2rem] flex items-center gap-5 shadow-md border border-slate-100 active:bg-slate-50 transition-all text-left"
+              >
+                <div className="bg-orange-100 p-4 rounded-2xl"><Landmark className="w-10 h-10 text-orange-600" /></div>
+                <div>
+                  <h3 className="font-black text-slate-800 text-lg leading-tight">INSS</h3>
+                  <p className="text-slate-400 font-bold text-xs mt-1">Contribuição <br /> Previdenciária</p>
                 </div>
                 <ChevronRight className="ml-auto w-8 h-8 text-slate-300" />
               </button>
@@ -396,7 +456,7 @@ const App: React.FC = () => {
         <footer className="fixed bottom-0 left-0 right-0 bg-yellow-400 p-4 border-t-2 border-yellow-500 flex items-center justify-center gap-3 z-50 h-14 shadow-inner">
           <ShieldCheck className="w-6 h-6 text-blue-900" />
           <p className="text-blue-900 font-black text-xs text-center">
-            O Seguro-Defeso é gratuito. <strong>Não pague taxas ao INSS.</strong>
+            O Pedido Seguro-Defeso é gratuito. <strong>Não pague taxas.</strong>
           </p>
         </footer>
       )}

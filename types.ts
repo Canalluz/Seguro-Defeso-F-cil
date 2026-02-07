@@ -30,3 +30,25 @@ export interface DefesoRecord {
   paymentStatus?: 'paid' | 'scheduled' | 'processing' | 'denied';
   paymentDate?: string;
 }
+
+export interface ReapReport {
+  id: string;
+  startDate: string;
+  endDate: string;
+  type: 'mar' | 'rio' | 'lagoa';
+  mode: 'embarcado' | 'terra';
+  quantity: string;
+  status: 'analysis' | 'approved' | 'pending';
+  photoUrl?: string; // Base64 or Blob URL
+  createdAt: number;
+}
+
+export interface InssContribution {
+  id: string;
+  month: string;
+  year: number;
+  income: number;
+  contributionValue: number;
+  status: 'paid' | 'pending' | 'generated';
+  createdAt: number;
+}

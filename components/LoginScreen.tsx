@@ -7,23 +7,14 @@ interface LoginScreenProps {
     username: string;
     securityMode?: 'biometric' | 'pin';
     storedPin?: string;
+    userPhoto?: string;
     onLoginSuccess: () => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ username, securityMode = 'biometric', storedPin, onLoginSuccess }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ username, securityMode = 'biometric', storedPin, userPhoto, onLoginSuccess }) => {
     const [pinInput, setPinInput] = useState('');
-    const [isScanning, setIsScanning] = useState(false);
-    const [isAuthenticating, setIsAuthenticating] = useState(false);
-
-    // Auto-trigger biometric on mount verification removed to prevent logout loop
-    // User must explicitly click to authenticate
-    /*
-    useEffect(() => {
-        if (securityMode === 'biometric') {
-            handleBiometricAuth();
-        }
-    }, []);
-    */
+    const [isScanning, setIsScanning] = useState(securityMode === 'biometric'); // Auto-start if biometric
+    const [isVerified, setIsVerified] = useState(false);
 
     const handleBiometricAuth = () => {
         setIsScanning(true);
@@ -31,43 +22,64 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ username, securityMode
 
     const handleScanComplete = () => {
         setIsScanning(false);
+        setIsVerified(true);
         playSuccess();
-        onLoginSuccess();
+        // Short delay to show the welcome message with name
+        setTimeout(() => {
+            onLoginSuccess();
+        }, 1500);
     };
 
     const handlePinChange = (val: string) => {
-        // Only allow numbers
         const cleanVal = val.replace(/[^0-9]/g, '');
         setPinInput(cleanVal);
 
         if (cleanVal.length === 4) {
             if (cleanVal === storedPin) {
                 playSuccess();
-                onLoginSuccess();
+                setIsVerified(true);
+                setTimeout(() => {
+                    onLoginSuccess();
+                }, 1000);
             } else {
                 playError();
-                // Shake effect logic could go here
                 setTimeout(() => setPinInput(''), 500);
             }
         }
     };
 
+    if (isVerified) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center p-6 animate-in zoom-in duration-500">
+                <div className="w-40 h-40 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-xl border-4 border-green-50 animate-bounce overflow-hidden relative">
+                    {userPhoto ? (
+                        <img src={userPhoto} alt="User" className="w-full h-full object-cover" />
+                    ) : (
+                        <User className="w-16 h-16 text-green-600" />
+                    )}
+                    <div className="absolute inset-0 ring-4 ring-green-400/50 rounded-full animate-pulse"></div>
+                </div>
+                <h2 className="text-3xl font-black text-slate-800 mb-2">Olá, {username.split(' ')[0]}!</h2>
+                <p className="text-slate-500 font-bold mb-10">Bem-vindo de volta.</p>
+                <div className="bg-green-50 text-green-700 px-6 py-2 rounded-full font-bold flex items-center gap-2">
+                    <LockKeyhole className="w-4 h-4" /> Acesso Liberado
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
-            <div className="w-24 h-24 bg-blue-100 rounded-[2rem] flex items-center justify-center mb-6 shadow-xl border-4 border-white">
-                <User className="w-10 h-10 text-blue-600" />
-            </div>
-
-            <h2 className="text-2xl font-black text-slate-800 mb-1">Olá, {username.split(' ')[0]}!</h2>
-            <p className="text-slate-400 font-bold mb-10">Bem-vindo de volta.</p>
-
             {securityMode === 'biometric' ? (
                 isScanning ? (
-                    <div className="w-full max-w-sm">
+                    <div className="w-full max-w-sm flex flex-col items-center">
                         <FaceScanner mode="verify" onScanComplete={handleScanComplete} />
-                        <p className="text-center text-slate-400 text-sm mt-4 font-bold">Mantenha o rosto na moldura</p>
+                        <p className="text-center text-slate-400 text-sm mt-8 font-bold animate-pulse">
+                            Reconhecendo usuário...
+                        </p>
                     </div>
                 ) : (
+                    // Fallback if scanning was cancelled or failed (though currently face scanner mocks success)
                     <button
                         onClick={handleBiometricAuth}
                         className="flex flex-col items-center gap-4 bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-100 active:scale-95 transition-transform"
@@ -76,7 +88,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ username, securityMode
                             <ScanFace className="w-12 h-12" />
                         </div>
                         <span className="font-bold text-slate-600 text-lg">
-                            Entrar com Face ID
+                            Tentar Novamente
                         </span>
                     </button>
                 )
@@ -99,6 +111,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ username, securityMode
                     </div>
                 </div>
             )}
+
+            <p className="mt-12 text-slate-300 text-xs font-bold text-center">
+                Autenticação Segura
+            </p>
         </div>
     );
 };

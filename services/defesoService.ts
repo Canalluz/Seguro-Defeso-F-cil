@@ -10,107 +10,162 @@ export interface DefesoDataResponse {
     source: 'cache' | 'network';
 }
 
-// Mock database of regional defesos
-const MOCK_DB: Record<string, DefesoInfo> = {
+// Definition of a Defeso Period (Day/Month)
+interface DefesoDefinition {
+    species: string;
+    description: string;
+    startDay: number;
+    startMonth: number; // 0-indexed (0 = Jan, 11 = Dec)
+    endDay: number;
+    endMonth: number;
+}
+
+// Official Defeso Definitions by Region (Portarias)
+const DEFESO_DEFINITIONS: Record<string, DefesoDefinition> = {
     'Norte - Bacia Amazônica': {
-        species: 'Tambaqui',
-        startDate: '01/12/2026',
-        endDate: '30/03/2027',
-        daysRemaining: 45,
-        hasRight: true,
-        region: 'Norte - Bacia Amazônica',
+        species: 'Tambaqui / Pirarucu',
         description: 'Período de reprodução. Proibida a pesca de espécies nativas.',
-        status: 'upcoming',
-        history: [
-            { id: 'h1', species: 'Tambaqui', region: 'Norte - Bacia Amazônica', startDate: '01/12/2024', endDate: '30/03/2025', status: 'finished', paymentStatus: 'paid', paymentDate: '15/04/2025' },
-            { id: 'h2', species: 'Tambaqui', region: 'Norte - Bacia Amazônica', startDate: '01/12/2023', endDate: '30/03/2024', status: 'finished', paymentStatus: 'paid', paymentDate: '10/04/2024' },
-            { id: 'h3', species: 'Pirarucu', region: 'Norte - Bacia Amazônica', startDate: '01/12/2022', endDate: '30/03/2023', status: 'finished', paymentStatus: 'paid', paymentDate: '12/04/2023' }
-        ]
+        startDay: 15,
+        startMonth: 10, // Nov (10)
+        endDay: 15,
+        endMonth: 2, // Mar (2)
     },
     'Nordeste - Bacia do Parnaíba': {
-        species: 'Camarão Rosa',
-        startDate: '01/12/2025',
-        endDate: '31/05/2026',
-        daysRemaining: 20,
-        hasRight: true,
-        region: 'Nordeste - Bacia do Parnaíba',
-        description: 'Defeso do camarão em águas costeiras.',
-        status: 'ongoing',
-        history: [
-            { id: 'h4', species: 'Camarão Rosa', region: 'Nordeste', startDate: '01/12/2024', endDate: '31/05/2025', status: 'finished', paymentStatus: 'paid', paymentDate: '15/06/2025' },
-            { id: 'h5', species: 'Camarão Rosa', region: 'Nordeste', startDate: '01/12/2023', endDate: '31/05/2024', status: 'finished', paymentStatus: 'paid', paymentDate: '20/06/2024' }
-        ]
+        species: 'Lagosta / Camarão',
+        description: 'Defeso para preservação dos estoques pesqueiros.',
+        startDay: 1,
+        startMonth: 1, // Feb (1)
+        endDay: 30,
+        endMonth: 3, // Apr (3)
     },
     'Centro-Oeste - Bacia do Paraguai': {
         species: 'Piracema (Geral)',
-        startDate: '05/11/2025',
-        endDate: '28/02/2026',
-        daysRemaining: 15,
-        hasRight: true,
-        region: 'Centro-Oeste - Bacia do Paraguai',
         description: 'Proteção à reprodução natural dos peixes.',
-        status: 'ongoing',
-        history: [
-            { id: 'h6', species: 'Piracema', region: 'Centro-Oeste', startDate: '05/11/2024', endDate: '28/02/2025', status: 'finished', paymentStatus: 'paid', paymentDate: '10/03/2025' }
-        ]
+        startDay: 5,
+        startMonth: 10, // Nov (10)
+        endDay: 28,
+        endMonth: 1, // Feb (1)
     },
     'Sudeste - Bacia do Paraná': {
         species: 'Piracema',
-        startDate: '01/11/2025',
-        endDate: '28/02/2026',
-        daysRemaining: 15,
-        hasRight: true,
-        region: 'Sudeste - Bacia do Paraná',
         description: 'Período de defeso para proteção da ictiofauna.',
-        status: 'ongoing',
-        history: [
-            { id: 'h7', species: 'Piracema', region: 'Sudeste', startDate: '01/11/2024', endDate: '28/02/2025', status: 'finished', paymentStatus: 'paid', paymentDate: '15/03/2025' }
-        ]
+        startDay: 1,
+        startMonth: 10, // Nov (10)
+        endDay: 28,
+        endMonth: 1, // Feb (1)
     },
-    // Fallback
     'default': {
-        species: 'Tambaqui',
-        startDate: '01/12/2025',
-        endDate: '30/03/2026',
-        daysRemaining: 12,
-        hasRight: true,
-        region: 'Norte - Bacia Amazônica',
-        description: 'Período de reprodução. Proibida a pesca.',
-        status: 'upcoming'
+        species: 'Espécies Nativas',
+        description: 'Período de defeso geral para reprodução.',
+        startDay: 1,
+        startMonth: 10, // Nov
+        endDay: 28,
+        endMonth: 1, // Feb
     }
 };
 
-export const fetchDefesoData = async (region: string, forceRefresh = false): Promise<DefesoDataResponse> => {
-    // Check Cache
-    const cachedData = localStorage.getItem(CACHE_KEY);
-    const cachedTime = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-    const now = Date.now();
+const calculateDefesoInfo = (region: string): DefesoInfo => {
+    const def = DEFESO_DEFINITIONS[region] || DEFESO_DEFINITIONS['default'];
+    const now = new Date();
+    const currentYear = now.getFullYear();
 
-    if (!forceRefresh && cachedData && cachedTime) {
-        const age = now - parseInt(cachedTime);
-        if (age < CACHE_DURATION) {
-            console.log("Serving Defeso data from cache");
-            return {
-                data: JSON.parse(cachedData),
-                lastUpdated: parseInt(cachedTime),
-                source: 'cache'
-            };
+    // Determine current/upcoming period years
+    let startYear = currentYear;
+    let endYear = currentYear;
+
+    // Adjust years if period wraps around (e.g., Nov to Feb)
+    if (def.startMonth > def.endMonth) {
+        endYear = currentYear + 1;
+        // If we are currently in Jan/Feb (before endMonth), the period started last year
+        if (now.getMonth() <= def.endMonth) {
+            startYear = currentYear - 1;
+            endYear = currentYear;
+        }
+        // If we are after endMonth but before startMonth, the NEXT period starts this year
+        else if (now.getMonth() < def.startMonth) {
+            startYear = currentYear;
+            endYear = currentYear + 1;
+        }
+    } else {
+        // Period within same year (e.g., Feb to Apr)
+        // If passed, move to next year
+        if (now.getMonth() > def.endMonth || (now.getMonth() === def.endMonth && now.getDate() > def.endDay)) {
+            startYear = currentYear + 1;
+            endYear = currentYear + 1;
         }
     }
 
-    // Simulate Network Request
-    console.log("Fetching Defeso data from network...");
-    await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5s delay
+    const startDate = new Date(startYear, def.startMonth, def.startDay);
+    const endDate = new Date(endYear, def.endMonth, def.endDay);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize today
 
-    const data = MOCK_DB[region] || MOCK_DB['default'];
+    let status: 'upcoming' | 'ongoing' | 'finished' = 'upcoming';
+    let daysRemaining = 0;
 
-    // Update Cache
-    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-    localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+    if (today >= startDate && today <= endDate) {
+        status = 'ongoing';
+        daysRemaining = 0; // Or days until end? Usually UI shows days TO start if upcoming.
+    } else if (today < startDate) {
+        status = 'upcoming';
+        const diffTime = Math.abs(startDate.getTime() - today.getTime());
+        daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    } else {
+        status = 'finished'; // Should be rare with logic above moving to next year logic
+    }
+
+    // Format dates DD/MM/YYYY
+    const formatDate = (d: Date) => d.toLocaleDateString('pt-BR');
+
+    // Generate Mock History
+    const history = [
+        {
+            id: 'h1',
+            species: def.species,
+            region: region,
+            startDate: formatDate(new Date(startYear - 1, def.startMonth, def.startDay)),
+            endDate: formatDate(new Date(endYear - 1, def.endMonth, def.endDay)),
+            status: 'finished' as const,
+            paymentStatus: 'paid' as const,
+            paymentDate: `15/04/${endYear - 1}`
+        },
+        {
+            id: 'h2',
+            species: def.species,
+            region: region,
+            startDate: formatDate(new Date(startYear - 2, def.startMonth, def.startDay)),
+            endDate: formatDate(new Date(endYear - 2, def.endMonth, def.endDay)),
+            status: 'finished' as const,
+            paymentStatus: 'paid' as const,
+            paymentDate: `10/04/${endYear - 2}`
+        }
+    ];
+
+    return {
+        species: def.species,
+        startDate: formatDate(startDate),
+        endDate: formatDate(endDate),
+        daysRemaining,
+        hasRight: true, // Mocked for now
+        region: region,
+        description: def.description,
+        status,
+        history
+    };
+};
+
+export const fetchDefesoData = async (region: string, forceRefresh = false): Promise<DefesoDataResponse> => {
+    // Check Cache (Optional: disable for dynamic date testing)
+    // For now, let's recalculate always to be accurate with system date
+
+    // Simulate Network Request (fast)
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const data = calculateDefesoInfo(region);
 
     return {
         data,
-        lastUpdated: now,
+        lastUpdated: Date.now(),
         source: 'network'
     };
 };

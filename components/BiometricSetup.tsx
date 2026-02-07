@@ -3,7 +3,7 @@ import { playClick, playSuccess, playError } from '../services/audio';
 import { FaceScanner } from './FaceScanner';
 
 interface BiometricSetupProps {
-    onComplete: (mode: 'biometric' | 'pin', pin?: string) => void;
+    onComplete: (mode: 'biometric' | 'pin', pin?: string, photo?: string) => void;
 }
 
 export const BiometricSetup: React.FC<BiometricSetupProps> = ({ onComplete }) => {
@@ -16,9 +16,9 @@ export const BiometricSetup: React.FC<BiometricSetupProps> = ({ onComplete }) =>
         setStep('face-scan');
     };
 
-    const handleScanComplete = () => {
+    const handleScanComplete = (photo?: string) => {
         playSuccess();
-        onComplete('biometric');
+        onComplete('biometric', undefined, photo);
     };
 
     const handlePinSubmit = () => {

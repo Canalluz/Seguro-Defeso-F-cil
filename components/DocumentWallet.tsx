@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FileText, Camera, Upload, Trash2, CheckCircle2, AlertCircle, Eye, Wallet } from 'lucide-react';
+import { FileText, Camera, Upload, Trash2, CheckCircle2, AlertCircle, Eye, Wallet, Download, ArrowLeft } from 'lucide-react';
 import { playClick, playSuccess, playError } from '../services/audio';
 import { saveDocument, getDocument, deleteDocument } from '../services/documentStorage';
 
-export const DocumentWallet: React.FC = () => {
+interface DocumentWalletProps {
+    onBack?: () => void;
+}
+
+export const DocumentWallet: React.FC<DocumentWalletProps> = ({ onBack }) => {
     const [documents, setDocuments] = useState<{
         rgp: string | null;
         cpf: string | null;
@@ -12,6 +16,7 @@ export const DocumentWallet: React.FC = () => {
 
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [activeDocType, setActiveDocType] = useState<'rgp' | 'cpf' | 'address' | null>(null);
+    const [docToDelete, setDocToDelete] = useState<'rgp' | 'cpf' | 'address' | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -83,13 +88,20 @@ export const DocumentWallet: React.FC = () => {
         setActiveDocType(null);
     };
 
-    const handleDelete = async (type: 'rgp' | 'cpf' | 'address') => {
-        if (confirm('Tem certeza que deseja excluir este documento?')) {
+    const confirmDelete = async () => {
+        if (docToDelete) {
             playClick();
-            await deleteDocument(type);
+            await deleteDocument(docToDelete);
             loadDocuments();
+            setDocToDelete(null);
         }
     };
+
+    const handleDeleteClick = (type: 'rgp' | 'cpf' | 'address') => {
+        playClick();
+        setDocToDelete(type);
+    };
+
 
     const renderDocCard = (type: 'rgp' | 'cpf' | 'address', label: string) => {
         const hasDoc = !!documents[type];
@@ -113,11 +125,12 @@ export const DocumentWallet: React.FC = () => {
                 {hasDoc ? (
                     <div className="relative h-40 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 group">
                         <img src={documents[type]!} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => handleDelete(type)} className="bg-red-500 text-white p-2 rounded-full shadow-lg">
-                                <Trash2 className="w-5 h-5" />
-                            </button>
-                        </div>
+                        <button
+                            onClick={() => handleDeleteClick(type)}
+                            className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full shadow-lg active:scale-90 transition-transform z-10"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </button>
                     </div>
                 ) : (
                     <div className="h-40 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 text-slate-400">
@@ -150,14 +163,22 @@ export const DocumentWallet: React.FC = () => {
     };
 
     return (
-        <div className="pb-24 animate-in slide-in-from-bottom-4 duration-500">
-            {/* Simple Header */}
-            <div className="bg-white rounded-[3rem] p-8 shadow-xl border border-slate-100 text-center mb-6">
-                <div className="w-20 h-20 bg-indigo-100 rounded-full mx-auto flex items-center justify-center mb-4 text-indigo-600 shadow-inner">
+        <div className="pb-24 animate-in slide-in-from-right duration-500">
+            {/* Header with Back Button */}
+            <div className="bg-white rounded-[3rem] p-8 shadow-xl border border-slate-100 text-center relative mb-6">
+                {onBack && (
+                    <button
+                        onClick={() => { playClick(); onBack(); }}
+                        className="absolute left-6 top-8 py-2 px-4 rounded-full bg-slate-100 text-slate-600 font-bold text-sm flex items-center gap-2 active:scale-95 transition-all shadow-sm"
+                    >
+                        <ArrowLeft className="w-4 h-4" /> Voltar
+                    </button>
+                )}
+                <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-600 shadow-inner">
                     <Wallet className="w-10 h-10" />
                 </div>
-                <h2 className="text-3xl font-black text-slate-800">Carteira Digital</h2>
-                <p className="text-slate-500 font-bold mt-2">Documentos salvos no seu aparelho.</p>
+                <h2 className="text-3xl font-black text-slate-800 leading-tight">Carteira Digital</h2>
+                <p className="text-slate-500 font-bold">Documentos salvos no seu aparelho.</p>
             </div>
 
             <div className="space-y-4">
@@ -187,6 +208,35 @@ export const DocumentWallet: React.FC = () => {
                             className="w-20 h-20 bg-white rounded-full border-4 border-slate-300 shadow-xl"
                         />
                         <div className="w-16"></div> {/* Spacer */}
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {docToDelete && (
+                <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-[2.5rem] p-6 w-full max-w-sm text-center shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Trash2 className="w-8 h-8 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-800 mb-2">Apagar Documento?</h3>
+                        <p className="text-slate-500 font-bold mb-6 leading-tight">
+                            Se apagar, você precisará enviar a foto novamente.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setDocToDelete(null)}
+                                className="flex-1 bg-slate-100 text-slate-700 py-3 rounded-xl font-black active:scale-95 transition-transform"
+                            >
+                                Manter
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="flex-1 bg-red-500 text-white py-3 rounded-xl font-black active:scale-95 transition-transform shadow-lg shadow-red-200"
+                            >
+                                Sim, Apagar
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
