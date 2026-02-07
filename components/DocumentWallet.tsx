@@ -164,16 +164,8 @@ export const DocumentWallet: React.FC<DocumentWalletProps> = ({ onBack }) => {
 
     return (
         <div className="pb-24 animate-in slide-in-from-right duration-500 max-w-4xl mx-auto w-full">
-            {/* Header with Back Button */}
+            {/* Header Area */}
             <div className="bg-white rounded-[3rem] p-8 shadow-xl border border-slate-100 text-center relative mb-6">
-                {onBack && (
-                    <button
-                        onClick={() => { playClick(); onBack(); }}
-                        className="absolute left-6 top-8 py-2 px-4 rounded-full bg-slate-100 text-slate-600 font-bold text-sm flex items-center gap-2 active:scale-95 transition-all shadow-sm"
-                    >
-                        <ArrowLeft className="w-4 h-4" /> <span className="hidden md:inline">Voltar</span>
-                    </button>
-                )}
                 <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-600 shadow-inner">
                     <Wallet className="w-10 h-10" />
                 </div>

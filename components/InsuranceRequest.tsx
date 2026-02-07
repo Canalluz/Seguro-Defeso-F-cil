@@ -385,23 +385,22 @@ export const InsuranceRequest: React.FC<InsuranceRequestProps> = ({ fisher, defe
 
     return (
         <div className="flex flex-col h-full max-w-4xl mx-auto w-full">
-            {/* Header */}
-            <div className="flex items-center gap-4 mb-6">
-                <button onClick={handleBack} className="bg-white py-2 px-4 rounded-full shadow-sm border border-slate-100 active:scale-90 transition-all flex items-center gap-2 text-slate-600 font-bold text-sm">
-                    <ChevronLeft className="w-4 h-4" /> Voltar
-                </button>
-                <div className="flex-1">
-                    <h2 className="text-xl md:text-2xl font-black text-slate-800 leading-none">Pedir Seguro</h2>
-                    <p className="text-xs font-bold text-slate-400">Passo {step} de 5</p>
+            {/* Progress Bar & Step Indicator */}
+            <div className="flex items-center justify-between mb-4 mt-2">
+                <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden mr-4">
+                    <div className="h-full bg-blue-600 transition-all duration-500 ease-out" style={{ width: `${(step / 5) * 100}%` }}></div>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center font-black text-blue-600 border-4 border-white shadow-sm">
+                <div className="font-black text-blue-600 bg-blue-50 px-4 py-1 rounded-full text-base">
                     {step}/5
                 </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="w-full h-2 bg-slate-100 rounded-full mb-8 overflow-hidden">
-                <div className="h-full bg-blue-600 transition-all duration-500 ease-out" style={{ width: `${(step / 5) * 100}%` }}></div>
+            {/* Step Title Header */}
+            <div className="mb-6">
+                <h2 className="text-2xl md:text-3xl font-black text-slate-800">
+                    {step === 1 ? 'Seus Dados' : step === 2 ? 'Tipo de Pesca' : step === 3 ? 'Período do Defeso' : step === 4 ? 'Anexar Documentos' : 'Revisar Pedido'}
+                </h2>
+                <p className="text-slate-500 font-bold">Confirme as informações para o Seguro-Defeso.</p>
             </div>
 
             {/* Content */}

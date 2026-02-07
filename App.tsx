@@ -21,7 +21,8 @@ import {
   Download,
   Github,
   ClipboardList,
-  Landmark
+  Landmark,
+  ArrowLeft
 } from 'lucide-react';
 import { BiometricAuth } from './components/BiometricAuth';
 import { speakExplanation } from './services/gemini';
@@ -400,8 +401,16 @@ const App: React.FC = () => {
       <div className="w-full max-w-screen-xl mx-auto flex flex-col min-h-screen relative">
         {activeTab !== 'loginBiometrics' && activeTab !== 'registrationBiometrics' && (
           <header className={`${isLoggedIn && activeTab === 'home' ? 'bg-white/95 backdrop-blur-xl' : 'bg-blue-700 text-white'} p-6 rounded-b-[3rem] shadow-xl sticky top-0 z-50 transition-all duration-500`}>
-            <div className="flex items-center justify-between max-w-screen-lg mx-auto w-full">
+            <div className="flex items-center justify-between max-w-screen-lg mx-auto w-full gap-4">
               <div className="flex items-center gap-3">
+                {isLoggedIn && activeTab !== 'home' && (
+                  <button
+                    onClick={() => { playClick(); setActiveTab('home'); }}
+                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-bold text-sm active:scale-90 transition-all mr-2"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Voltar
+                  </button>
+                )}
                 <div className={`${isLoggedIn && activeTab === 'home' ? 'bg-blue-600' : 'bg-white/20'} p-3 rounded-2xl`}>
                   <Fish className="w-8 h-8 text-white" />
                 </div>
